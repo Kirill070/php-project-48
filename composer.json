@@ -1,0 +1,25 @@
+{
+    "name": "hexlet/code",
+    "autoload": {
+        "psr-4": {
+            "Hexlet\\Code\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kirill Chernyy",
+            "email": "kirill070@gmail.com"
+        }
+    ],
+    "description": "hexlet project Gendiff",
+    "license": "MIT",
+    "bin": [
+        "bin/gendiff"
+    ],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*"
+    },
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
