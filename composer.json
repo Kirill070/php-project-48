@@ -16,6 +16,9 @@
     ],
     "description": "hexlet project Gendiff",
     "license": "MIT",
+    "scripts": {
+        "test": "phpunit tests"
+    },
     "bin": [
         "bin/gendiff"
     ],
