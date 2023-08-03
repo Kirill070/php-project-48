@@ -40,26 +40,28 @@ function genDiff(string $pathToFile1, string $pathToFile2)
         }
     };
 
-    echo "{" . "\n";
+    $result = ["{"];
 
     foreach ($diff as $key => $value) {
         switch ($value) {
             case 'added':
-                echo "  + {$key}: {$dataFromFile2[$key]}" . "\n";
+                $result[] = "  + {$key}: {$dataFromFile2[$key]}";
                 break;
             case 'deleted':
-                echo "  - {$key}: {$dataFromFile1[$key]}" . "\n";
+                $result[] = "  - {$key}: {$dataFromFile1[$key]}";
                 break;
             case 'changed':
-                echo "  - {$key}: {$dataFromFile1[$key]}" . "\n";
-                echo "  + {$key}: {$dataFromFile2[$key]}" . "\n";
+                $result[] = "  - {$key}: {$dataFromFile1[$key]}";
+                $result[] = "  + {$key}: {$dataFromFile2[$key]}";
                 break;
             case 'unchanged':
-                echo "    {$key}: {$dataFromFile1[$key]}" . "\n";
+                $result[] = "    {$key}: {$dataFromFile1[$key]}";
                 break;
             default:
                 throw new Exception("Error! Invalid value!");
         }
     }
-    echo "}" . "\n";
+    $result[] = "}";
+
+    return implode("\n", $result);
 }
