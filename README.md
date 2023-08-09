@@ -6,4 +6,10 @@
 
 ## Записи примера работы пакета:
 
+# Запись первого этапа работы пакета с .json файлами
+
 [![asciicast](https://asciinema.org/a/wNR5yK7yML6RCVGqzGwKmZK1y.svg)](https://asciinema.org/a/wNR5yK7yML6RCVGqzGwKmZK1y)
+
+# Запись первого этапа работы пакета с .yml файлами
+
+[![asciicast](https://asciinema.org/a/did6HEXY1JVgqe0uX0twfRWTM.svg)](https://asciinema.org/a/did6HEXY1JVgqe0uX0twfRWTM)

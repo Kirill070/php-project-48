@@ -12,5 +12,6 @@ class DifferTest extends TestCase
     {
         $expected = file_get_contents("tests/fixtures/resultGendiff.txt");
         $this->assertEquals($expected, gendiff("tests/fixtures/file1.json", "tests/fixtures/file2.json"));
+        $this->assertEquals($expected, gendiff("tests/fixtures/filepath1.yml", "tests/fixtures/filepath2.yml"));
     }
 }

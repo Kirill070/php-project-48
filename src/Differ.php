@@ -2,6 +2,8 @@
 
 namespace Differ\Differ;
 
+use function Differ\Parsers\convertToArray;
+
 function makeString(array $array): array
 {
     $result = [];
@@ -18,10 +20,18 @@ function makeString(array $array): array
     return $result;
 }
 
+function getDataForDiff(string $pathToFile): array
+{
+    $fileContent = file_get_contents($pathToFile);
+    $extension = pathinfo($pathToFile, PATHINFO_EXTENSION);
+
+    return convertToArray($fileContent, $extension);
+}
+
 function genDiff(string $pathToFile1, string $pathToFile2)
 {
-    $dataFromFile1 = json_decode(file_get_contents($pathToFile1), true);
-    $dataFromFile2 = json_decode(file_get_contents($pathToFile2), true);
+    $dataFromFile1 = getDataForDiff($pathToFile1);
+    $dataFromFile2 = getDataForDiff($pathToFile2);
     $dataFromFile1 = makeString($dataFromFile1);
     $dataFromFile2 = makeString($dataFromFile2);
 
