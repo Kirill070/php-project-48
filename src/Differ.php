@@ -25,6 +25,10 @@ function makeString(mixed $value): mixed
 function getDataForDiff(string $pathToFile): array
 {
     $fileContent = file_get_contents($pathToFile);
+    if ($fileContent === false) {
+        throw new \Exception("Can't read file");
+    }
+
     $extension = pathinfo($pathToFile, PATHINFO_EXTENSION);
 
     return convertContentToArray($fileContent, $extension);
