@@ -43,6 +43,10 @@ function convertString(mixed $value): string
         return 'null';
     }
 
+    if ($value === '0') {
+        return 0;
+    }
+
     if (!is_array($value)) {
         return "'{$value}'";
     }
