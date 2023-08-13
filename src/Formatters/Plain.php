@@ -43,13 +43,13 @@ function convertString(mixed $value): string
         return 'null';
     }
 
-    if ($value === '0') {
-        return 0;
-    }
-
-    if (!is_array($value)) {
+    if (is_string($value)) {
         return "'{$value}'";
     }
 
-    return "[complex value]";
+    if (is_array($value)) {
+        return "[complex value]";
+    }
+
+    return $value;
 }
