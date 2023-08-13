@@ -21,7 +21,7 @@ function formatStylish(array $ast, int $depth = 0): string
                 return "{$indent}  - {$node['key']}: " . convertString($node['oldValue'], $depth) . "\n"
                 . "{$indent}  + {$node['key']}: " . convertString($node['newValue'], $depth);
             default:
-                throw new \Exception("Unknown node status: {$status}");
+                throw new \Exception("Unknown node status: {$node['status']}");
         }
     }, $ast);
     $result = ["{", ...$string, "{$indent}}"];

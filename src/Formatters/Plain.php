@@ -22,7 +22,7 @@ function formatPlain(array $ast, string $valuePath = ''): string
                 $oldValue = convertString($node['oldValue']);
                 return "Property '{$fullValuePath}' was updated. From {$oldValue} to {$newValue}";
             default:
-                throw new \Exception("Unknown node status: {$status}");
+                throw new \Exception("Unknown node status: {$node['status']}");
         }
     }, $ast);
     $result = array_filter($string);
