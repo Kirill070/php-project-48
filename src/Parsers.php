@@ -4,7 +4,7 @@ namespace Differ\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
 
-function convertToArray(string $fileContent, string $extension): array
+function convertContentToArray(string $fileContent, string $extension): array
 {
     switch ($extension) {
         case 'json':

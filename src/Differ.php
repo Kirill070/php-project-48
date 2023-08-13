@@ -2,22 +2,24 @@
 
 namespace Differ\Differ;
 
-use function Differ\Parsers\convertToArray;
+use function Differ\Parsers\convertContentToArray;
+use function Functional\sort;
+use function Differ\Formatters\format;
 
-function makeString(array $array): array
+function makeString(mixed $value): mixed
 {
-    $result = [];
-    foreach ($array as $key => $value) {
+    if (!is_array($value)) {
         if (is_bool($value)) {
-            $result[$key] = $value ? 'true' : 'false';
+            $result = $value ? 'true' : 'false';
         } elseif (is_null($value)) {
-            $result[$key] = 'null';
+            $result = 'null';
         } else {
-            $result[$key] = $value;
+            $result = $value;
         }
+        return $result;
     }
 
-    return $result;
+    return $value;
 }
 
 function getDataForDiff(string $pathToFile): array
@@ -25,53 +27,65 @@ function getDataForDiff(string $pathToFile): array
     $fileContent = file_get_contents($pathToFile);
     $extension = pathinfo($pathToFile, PATHINFO_EXTENSION);
 
-    return convertToArray($fileContent, $extension);
+    return convertContentToArray($fileContent, $extension);
 }
 
-function genDiff(string $pathToFile1, string $pathToFile2)
+function makeAst(array $dataFromFile1, array $dataFromFile2): array
+{
+    $keysArrays = array_merge(array_keys($dataFromFile1), array_keys($dataFromFile2));
+    $keysArray = array_unique($keysArrays);
+    $sortKeysArray = sort($keysArray, fn ($left, $right) => strcmp($left, $right));
+
+    $result = array_map(function ($key) use ($dataFromFile1, $dataFromFile2) {
+
+        $firstValue = $dataFromFile1[$key] ?? null;
+        $secondValue = $dataFromFile2[$key] ?? null;
+
+        if (is_array($firstValue) && is_array($secondValue)) {
+            return [
+                'key' => $key,
+                'status' => 'nested',
+                'children' => makeAst($firstValue, $secondValue)
+            ];
+        }
+        if (!key_exists($key, $dataFromFile2)) {
+            return [
+                'key' => $key,
+                'status' => 'deleted',
+                'oldValue' => makeString($firstValue)
+            ];
+        }
+        if (!key_exists($key, $dataFromFile1)) {
+            return [
+                'key' => $key,
+                'status' => 'added',
+                'newValue' => makeString($secondValue)
+            ];
+        }
+        if ($firstValue !== $secondValue) {
+            return [
+                'key' => $key,
+                'status' => 'changed',
+                'oldValue' => makeString($firstValue),
+                'newValue' => makeString($secondValue)
+            ];
+        }
+        return [
+            'key' => $key,
+            'status' => 'unchanged',
+            'oldValue' => makeString($firstValue)
+        ];
+    }, $sortKeysArray);
+
+    return $result;
+}
+
+function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish'): string
 {
     $dataFromFile1 = getDataForDiff($pathToFile1);
     $dataFromFile2 = getDataForDiff($pathToFile2);
-    $dataFromFile1 = makeString($dataFromFile1);
-    $dataFromFile2 = makeString($dataFromFile2);
 
-    $keys = array_merge(array_keys($dataFromFile1), array_keys($dataFromFile2));
-    sort($keys);
-    $diff = [];
-    foreach ($keys as $key) {
-        if (!array_key_exists($key, $dataFromFile1)) {
-            $diff[$key] = 'added';
-        } elseif (!array_key_exists($key, $dataFromFile2)) {
-            $diff[$key] = 'deleted';
-        } elseif ($dataFromFile1[$key] !== $dataFromFile2[$key]) {
-            $diff[$key] = 'changed';
-        } else {
-            $diff[$key] = 'unchanged';
-        }
-    };
+    $result = makeAst($dataFromFile1, $dataFromFile2);
 
-    $result = ["{"];
-
-    foreach ($diff as $key => $value) {
-        switch ($value) {
-            case 'added':
-                $result[] = "  + {$key}: {$dataFromFile2[$key]}";
-                break;
-            case 'deleted':
-                $result[] = "  - {$key}: {$dataFromFile1[$key]}";
-                break;
-            case 'changed':
-                $result[] = "  - {$key}: {$dataFromFile1[$key]}";
-                $result[] = "  + {$key}: {$dataFromFile2[$key]}";
-                break;
-            case 'unchanged':
-                $result[] = "    {$key}: {$dataFromFile1[$key]}";
-                break;
-            default:
-                throw new Exception("Error! Invalid value!");
-        }
-    }
-    $result[] = "}";
-
-    return implode("\n", $result);
+    return format($result, $format);
 }
