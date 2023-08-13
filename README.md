@@ -21,3 +21,7 @@
 ### Запись сравнения файлов, имеющих вложенную структуру, с выводом в формате 'plain'
 
 [![asciicast](https://asciinema.org/a/XuOH5IkAFow9Q7TJIJ6rXtXXO.svg)](https://asciinema.org/a/XuOH5IkAFow9Q7TJIJ6rXtXXO)
+
+### Запись сравнения файлов, имеющих вложенную структуру, с выводом в формате 'json'
+
+[![asciicast](https://asciinema.org/a/4Wbkb9QL2aXl5qo26pfou2hX0.svg)](https://asciinema.org/a/4Wbkb9QL2aXl5qo26pfou2hX0)
