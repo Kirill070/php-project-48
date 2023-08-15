@@ -4,6 +4,41 @@
 [![Differ CI](https://github.com/Kirill070/php-project-48/actions/workflows/my-check.yml/badge.svg)](https://github.com/Kirill070/php-project-48/actions/workflows/my-check.yml)<br>
 [![Test Coverage](https://api.codeclimate.com/v1/badges/295354b96a25dd51311e/test_coverage)](https://codeclimate.com/github/Kirill070/php-project-48/test_coverage)<br>
 
+## Описание:
+
+Вычислитель отличий – программа, определяющая разницу между двумя структурами данных.
+Возможности утилиты:
+  - Поддержка разных входных форматов: yaml и json
+  - Генерация отчета в виде plain text, stylish и json
+
+Пример использования:
+
+```sh
+# формат plain
+gendiff --format plain path/to/file.yml another/path/file.json
+
+Property 'common.follow' was added with value: false
+Property 'group1.baz' was updated. From 'bas' to 'bars'
+Property 'group2' was removed
+
+# формат stylish
+gendiff filepath1.json filepath2.json
+
+{
+  + follow: false
+    setting1: Value 1
+  - setting2: 200
+  - setting3: true
+  + setting3: {
+        key: value
+    }
+  + setting4: blah blah
+  + setting5: {
+        key5: value5
+    }
+}
+``` 
+
 ## Записи примера работы пакета:
 
 ### Запись сравнения плоских .json-файлов

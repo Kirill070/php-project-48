@@ -42,42 +42,42 @@ function makeAst(array $dataFromFile1, array $dataFromFile2): array
 
     $result = array_map(function ($key) use ($dataFromFile1, $dataFromFile2) {
 
-        $firstValue = $dataFromFile1[$key] ?? null;
-        $secondValue = $dataFromFile2[$key] ?? null;
+        $oldValue = $dataFromFile1[$key] ?? null;
+        $newValue = $dataFromFile2[$key] ?? null;
 
-        if (is_array($firstValue) && is_array($secondValue)) {
+        if (is_array($oldValue) && is_array($newValue)) {
             return [
                 'key' => $key,
                 'status' => 'nested',
-                'children' => makeAst($firstValue, $secondValue)
+                'children' => makeAst($oldValue, $newValue)
             ];
         }
         if (!key_exists($key, $dataFromFile2)) {
             return [
                 'key' => $key,
                 'status' => 'deleted',
-                'oldValue' => makeString($firstValue)
+                'oldValue' => makeString($oldValue)
             ];
         }
         if (!key_exists($key, $dataFromFile1)) {
             return [
                 'key' => $key,
                 'status' => 'added',
-                'newValue' => makeString($secondValue)
+                'newValue' => makeString($newValue)
             ];
         }
-        if ($firstValue !== $secondValue) {
+        if ($oldValue !== $newValue) {
             return [
                 'key' => $key,
                 'status' => 'changed',
-                'oldValue' => makeString($firstValue),
-                'newValue' => makeString($secondValue)
+                'oldValue' => makeString($oldValue),
+                'newValue' => makeString($newValue)
             ];
         }
         return [
             'key' => $key,
             'status' => 'unchanged',
-            'oldValue' => makeString($firstValue)
+            'oldValue' => makeString($oldValue)
         ];
     }, $sortKeysArray);
 
