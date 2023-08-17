@@ -2,7 +2,7 @@
 
 namespace Differ\Differ;
 
-use function Differ\Parsers\convertContentToArray;
+use function Differ\Parsers\parse;
 use function Functional\sort;
 use function Differ\Formatters\format;
 
@@ -22,44 +22,44 @@ function makeString(mixed $value): mixed
     return $value;
 }
 
-function getDataForDiff(string $pathToFile): array
+function getFileData(string $path): array
 {
-    $fileContent = file_get_contents($pathToFile);
-    if ($fileContent === false) {
+    $data = file_get_contents($path);
+    if ($data === false) {
         throw new \Exception("Can't read file");
     }
 
-    $extension = pathinfo($pathToFile, PATHINFO_EXTENSION);
+    $format = pathinfo($path, PATHINFO_EXTENSION);
 
-    return convertContentToArray($fileContent, $extension);
+    return parse($data, $format);
 }
 
-function makeAst(array $dataFromFile1, array $dataFromFile2): array
+function makeTree(array $data1, array $data2): array
 {
-    $keysArrays = array_merge(array_keys($dataFromFile1), array_keys($dataFromFile2));
+    $keysArrays = array_merge(array_keys($data1), array_keys($data2));
     $keysArray = array_unique($keysArrays);
     $sortKeysArray = sort($keysArray, fn ($left, $right) => strcmp($left, $right));
 
-    $result = array_map(function ($key) use ($dataFromFile1, $dataFromFile2) {
+    $result = array_map(function ($key) use ($data1, $data2) {
 
-        $oldValue = $dataFromFile1[$key] ?? null;
-        $newValue = $dataFromFile2[$key] ?? null;
+        $oldValue = $data1[$key] ?? null;
+        $newValue = $data2[$key] ?? null;
 
         if (is_array($oldValue) && is_array($newValue)) {
             return [
                 'key' => $key,
                 'status' => 'nested',
-                'children' => makeAst($oldValue, $newValue)
+                'children' => makeTree($oldValue, $newValue)
             ];
         }
-        if (!key_exists($key, $dataFromFile2)) {
+        if (!key_exists($key, $data2)) {
             return [
                 'key' => $key,
                 'status' => 'deleted',
                 'oldValue' => makeString($oldValue)
             ];
         }
-        if (!key_exists($key, $dataFromFile1)) {
+        if (!key_exists($key, $data1)) {
             return [
                 'key' => $key,
                 'status' => 'added',
@@ -84,12 +84,12 @@ function makeAst(array $dataFromFile1, array $dataFromFile2): array
     return $result;
 }
 
-function genDiff(string $pathToFile1, string $pathToFile2, string $format = 'stylish'): string
+function genDiff(string $path1, string $path2, string $format = 'stylish'): string
 {
-    $dataFromFile1 = getDataForDiff($pathToFile1);
-    $dataFromFile2 = getDataForDiff($pathToFile2);
+    $data1 = getFileData($path1);
+    $data2 = getFileData($path2);
 
-    $result = makeAst($dataFromFile1, $dataFromFile2);
+    $result = makeTree($data1, $data2);
 
     return format($result, $format);
 }

@@ -4,16 +4,15 @@ namespace Differ\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
 
-function convertContentToArray(string $fileContent, string $extension): array
+function parse(string $data, string $format): array
 {
-    switch ($extension) {
+    switch ($format) {
         case 'json':
-            return $array = json_decode($fileContent, true);
+            return $array = json_decode($data, true);
         case 'yaml':
-            return $array = Yaml::parse($fileContent);
         case 'yml':
-            return $array = Yaml::parse($fileContent);
+            return $array = Yaml::parse($data);
         default:
-            throw new \Exception("Unknown extension: '{$extension}'");
+            throw new \Exception("Unknown extension: '$format'");
     }
 }

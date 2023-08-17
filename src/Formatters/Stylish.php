@@ -2,29 +2,34 @@
 
 namespace Differ\Formatters\Stylish;
 
-function formatStylish(array $ast, int $depth = 0): string
+function render(array $tree, int $depth = 0): string
 {
     $indent = str_repeat('    ', $depth);
 
     $string = array_map(function ($node) use ($indent, $depth) {
 
-        switch ($node['status']) {
+        $key = $node['key'];
+        $status = $node['status'];
+        $oldValue = $node['oldValue'] ?? null;
+        $newValue = $node['newValue'] ?? null;
+
+        switch ($status) {
             case 'nested':
-                return "{$indent}    {$node['key']}: " . formatStylish($node['children'], $depth + 1);
+                return "$indent    $key: " . render($node['children'], $depth + 1);
             case 'unchanged':
-                return "{$indent}    {$node['key']}: " . convertString($node['oldValue'], $depth);
+                return "$indent    $key: " . convertString($oldValue, $depth);
             case 'added':
-                return "{$indent}  + {$node['key']}: " . convertString($node['newValue'], $depth);
+                return "$indent  + $key: " . convertString($newValue, $depth);
             case 'deleted':
-                return "{$indent}  - {$node['key']}: " . convertString($node['oldValue'], $depth);
+                return "$indent  - $key: " . convertString($oldValue, $depth);
             case 'changed':
-                return "{$indent}  - {$node['key']}: " . convertString($node['oldValue'], $depth) . "\n"
-                . "{$indent}  + {$node['key']}: " . convertString($node['newValue'], $depth);
+                return "$indent  - $key: " . convertString($oldValue, $depth) . "\n"
+                . "$indent  + $key: " . convertString($newValue, $depth);
             default:
-                throw new \Exception("Unknown node status: {$node['status']}");
+                throw new \Exception("Unknown node status: '$status'");
         }
-    }, $ast);
-    $result = ["{", ...$string, "{$indent}}"];
+    }, $tree);
+    $result = ["{", ...$string, "$indent}"];
     return implode("\n", $result);
 }
 
@@ -38,7 +43,7 @@ function convertString(mixed $value, int $depth): string
     $keys = array_keys($value);
     $string = array_map(function ($key, $value) use ($indent, $depth) {
         $result = convertString($value, $depth + 1);
-        return "{$indent}    {$key}: {$result}";
+        return "$indent    $key: $result";
     }, $keys, $value);
     return '{' . "\n" . implode("\n", $string) . "\n" . $indent . '}';
 }

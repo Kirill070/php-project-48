@@ -2,29 +2,32 @@
 
 namespace Differ\Formatters\Plain;
 
-function formatPlain(array $ast, string $valuePath = ''): string
+function render(array $tree, string $valuePath = ''): string
 {
     $string = array_map(function ($node) use ($valuePath) {
-        $fullValuePath = $valuePath === '' ? $node['key'] : "{$valuePath}.{$node['key']}";
 
-        switch ($node['status']) {
+        $key = $node['key'];
+        $status = $node['status'];
+        $oldValue = isset($node['oldValue']) ? convertString($node['oldValue']) : null;
+        $newValue = isset($node['newValue']) ? convertString($node['newValue']) : null;
+
+        $fullValuePath = $valuePath === '' ? $key : "$valuePath.$key";
+
+        switch ($status) {
             case 'nested':
-                return formatPlain($node['children'], $fullValuePath);
+                return render($node['children'], $fullValuePath);
             case 'unchanged':
                 return;
             case 'added':
-                $newValue = convertString($node['newValue']);
-                return "Property '{$fullValuePath}' was added with value: {$newValue}";
+                return "Property '$fullValuePath' was added with value: $newValue";
             case 'deleted':
-                return "Property '{$fullValuePath}' was removed";
+                return "Property '$fullValuePath' was removed";
             case 'changed':
-                $newValue = convertString($node['newValue']);
-                $oldValue = convertString($node['oldValue']);
-                return "Property '{$fullValuePath}' was updated. From {$oldValue} to {$newValue}";
+                return "Property '$fullValuePath' was updated. From $oldValue to $newValue";
             default:
-                throw new \Exception("Unknown node status: {$node['status']}");
+                throw new \Exception("Unknown node status: '$status'");
         }
-    }, $ast);
+    }, $tree);
     $result = array_filter($string);
 
     return implode("\n", $result);
@@ -45,7 +48,7 @@ function convertString(mixed $value): string
     }
 
     if (is_string($value)) {
-        return "'{$value}'";
+        return "'$value'";
     }
 
     if (is_array($value)) {
