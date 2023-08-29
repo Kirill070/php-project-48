@@ -6,22 +6,6 @@ use function Differ\Parsers\parse;
 use function Functional\sort;
 use function Differ\Formatters\format;
 
-function makeString(mixed $value): mixed
-{
-    if (!is_array($value)) {
-        if (is_bool($value)) {
-            $result = $value ? 'true' : 'false';
-        } elseif (is_null($value)) {
-            $result = 'null';
-        } else {
-            $result = $value;
-        }
-        return $result;
-    }
-
-    return $value;
-}
-
 function getFileData(string $path): array
 {
     $data = file_get_contents($path);
@@ -36,11 +20,10 @@ function getFileData(string $path): array
 
 function makeTree(array $data1, array $data2): array
 {
-    $keysArrays = array_merge(array_keys($data1), array_keys($data2));
-    $keysArray = array_unique($keysArrays);
-    $sortKeysArray = sort($keysArray, fn ($left, $right) => strcmp($left, $right));
+    $keys = array_unique(array_merge(array_keys($data1), array_keys($data2)));
+    $sortKeys = sort($keys, fn ($left, $right) => strcmp($left, $right));
 
-    $result = array_map(function ($key) use ($data1, $data2) {
+    $tree = array_map(function ($key) use ($data1, $data2) {
 
         $oldValue = $data1[$key] ?? null;
         $newValue = $data2[$key] ?? null;
@@ -56,32 +39,32 @@ function makeTree(array $data1, array $data2): array
             return [
                 'key' => $key,
                 'status' => 'deleted',
-                'oldValue' => makeString($oldValue)
+                'oldValue' => $oldValue
             ];
         }
         if (!key_exists($key, $data1)) {
             return [
                 'key' => $key,
                 'status' => 'added',
-                'newValue' => makeString($newValue)
+                'newValue' => $newValue
             ];
         }
         if ($oldValue !== $newValue) {
             return [
                 'key' => $key,
                 'status' => 'changed',
-                'oldValue' => makeString($oldValue),
-                'newValue' => makeString($newValue)
+                'oldValue' => $oldValue,
+                'newValue' => $newValue
             ];
         }
         return [
             'key' => $key,
             'status' => 'unchanged',
-            'oldValue' => makeString($oldValue)
+            'oldValue' => $oldValue
         ];
-    }, $sortKeysArray);
+    }, $sortKeys);
 
-    return $result;
+    return $tree;
 }
 
 function genDiff(string $path1, string $path2, string $format = 'stylish'): string
@@ -89,7 +72,7 @@ function genDiff(string $path1, string $path2, string $format = 'stylish'): stri
     $data1 = getFileData($path1);
     $data2 = getFileData($path2);
 
-    $result = makeTree($data1, $data2);
+    $tree = makeTree($data1, $data2);
 
-    return format($result, $format);
+    return format($tree, $format);
 }

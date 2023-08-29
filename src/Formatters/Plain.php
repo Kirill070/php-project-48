@@ -4,12 +4,12 @@ namespace Differ\Formatters\Plain;
 
 function render(array $tree, string $valuePath = ''): string
 {
-    $string = array_map(function ($node) use ($valuePath) {
+    $lines = array_map(function ($node) use ($valuePath) {
 
         $key = $node['key'];
         $status = $node['status'];
-        $oldValue = isset($node['oldValue']) ? convertString($node['oldValue']) : null;
-        $newValue = isset($node['newValue']) ? convertString($node['newValue']) : null;
+        $oldValue = $node['oldValue'] ?? null;
+        $newValue = $node['newValue'] ?? null;
 
         $fullValuePath = $valuePath === '' ? $key : "$valuePath.$key";
 
@@ -19,31 +19,28 @@ function render(array $tree, string $valuePath = ''): string
             case 'unchanged':
                 return;
             case 'added':
-                return "Property '$fullValuePath' was added with value: $newValue";
+                return "Property '$fullValuePath' was added with value: " . convertString($newValue);
             case 'deleted':
                 return "Property '$fullValuePath' was removed";
             case 'changed':
-                return "Property '$fullValuePath' was updated. From $oldValue to $newValue";
+                return "Property '$fullValuePath' was updated. From " .
+                    convertString($oldValue) . " to " . convertString($newValue);
             default:
                 throw new \Exception("Unknown node status: '$status'");
         }
     }, $tree);
-    $result = array_filter($string);
+    $output = array_filter($lines);
 
-    return implode("\n", $result);
+    return implode("\n", $output);
 }
 
 function convertString(mixed $value): string
 {
-    if ($value === 'false') {
-        return 'false';
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
     }
 
-    if ($value === 'true') {
-        return 'true';
-    }
-
-    if ($value === 'null') {
+    if (is_null($value)) {
         return 'null';
     }
 
@@ -55,5 +52,5 @@ function convertString(mixed $value): string
         return "[complex value]";
     }
 
-    return $value;
+    return '$value';
 }

@@ -6,7 +6,7 @@ function render(array $tree, int $depth = 0): string
 {
     $indent = str_repeat('    ', $depth);
 
-    $string = array_map(function ($node) use ($indent, $depth) {
+    $lines = array_map(function ($node) use ($indent, $depth) {
 
         $key = $node['key'];
         $status = $node['status'];
@@ -29,21 +29,33 @@ function render(array $tree, int $depth = 0): string
                 throw new \Exception("Unknown node status: '$status'");
         }
     }, $tree);
-    $result = ["{", ...$string, "$indent}"];
-    return implode("\n", $result);
+    $output = ["{", ...$lines, "$indent}"];
+    return implode("\n", $output);
 }
 
 function convertString(mixed $value, int $depth): string
 {
-    if (!is_array($value)) {
-        return $value;
+    if (is_bool($value)) {
+        return $value ? 'true' : 'false';
     }
-    $indent = str_repeat('    ', $depth + 1);
 
-    $keys = array_keys($value);
-    $string = array_map(function ($key, $value) use ($indent, $depth) {
-        $result = convertString($value, $depth + 1);
-        return "$indent    $key: $result";
-    }, $keys, $value);
-    return '{' . "\n" . implode("\n", $string) . "\n" . $indent . '}';
+    if (is_null($value)) {
+        return 'null';
+    }
+
+    if (is_string($value)) {
+        return "$value";
+    }
+    if (is_array($value)) {
+        $indent = str_repeat('    ', $depth + 1);
+
+        $keys = array_keys($value);
+        $string = array_map(function ($key, $value) use ($indent, $depth) {
+            $result = convertString($value, $depth + 1);
+            return "$indent    $key: $result";
+        }, $keys, $value);
+        return '{' . "\n" . implode("\n", $string) . "\n" . $indent . '}';
+    }
+
+    return $value;
 }

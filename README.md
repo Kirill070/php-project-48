@@ -11,7 +11,7 @@
   - Поддержка разных входных форматов: yaml и json
   - Генерация отчета в виде plain text, stylish и json
 
-Пример использования:
+### Пример использования:
 
 ```sh
 # формат plain
@@ -38,6 +38,23 @@ gendiff filepath1.json filepath2.json
     }
 }
 ``` 
+
+## Минимальные требования:
+
+* Ubuntu Linux (https://ubuntu.com/)
+* PHP версии 8 и выше (https://www.php.net/downloads.php)
+* Composer (https://getcomposer.org/download/)
+
+
+## Установка:
+
+```sh
+$ git clone git@github.com:Kirill070/php-project-48.git
+
+$ cd php-project-48
+
+$ composer install
+```
 
 ## Записи примера работы пакета:
 
