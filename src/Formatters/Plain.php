@@ -52,5 +52,5 @@ function convertString(mixed $value): string
         return "[complex value]";
     }
 
-    return '$value';
+    return $value;
 }
