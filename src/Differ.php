@@ -6,16 +6,14 @@ use function Differ\Parsers\parse;
 use function Functional\sort;
 use function Differ\Formatters\format;
 
-function getFileData(string $path): array
+function getFileData(string $path): string
 {
     $data = file_get_contents($path);
     if ($data === false) {
         throw new \Exception("Can't read file");
     }
 
-    $format = pathinfo($path, PATHINFO_EXTENSION);
-
-    return parse($data, $format);
+    return $data;
 }
 
 function makeTree(array $data1, array $data2): array
@@ -69,8 +67,8 @@ function makeTree(array $data1, array $data2): array
 
 function genDiff(string $path1, string $path2, string $format = 'stylish'): string
 {
-    $data1 = getFileData($path1);
-    $data2 = getFileData($path2);
+    $data1 = parse(getFileData($path1), pathinfo($path1, PATHINFO_EXTENSION));
+    $data2 = parse(getFileData($path2), pathinfo($path2, PATHINFO_EXTENSION));
 
     $tree = makeTree($data1, $data2);
 
