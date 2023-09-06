@@ -8,10 +8,10 @@ function parse(string $data, string $format): array
 {
     switch ($format) {
         case 'json':
-            return $array = json_decode($data, true);
+            return json_decode($data, true);
         case 'yaml':
         case 'yml':
-            return $array = Yaml::parse($data);
+            return Yaml::parse($data);
         default:
             throw new \Exception("Unknown extension: '$format'");
     }
