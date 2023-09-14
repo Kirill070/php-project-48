@@ -13,6 +13,6 @@ function parse(string $data, string $format): array
         case 'yml':
             return Yaml::parse($data);
         default:
-            throw new \Exception("Unknown extension: '$format'");
+            throw new \Exception("Unknown format: '$format'");
     }
 }

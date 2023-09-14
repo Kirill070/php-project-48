@@ -2,16 +2,24 @@
 
 namespace Differ\Formatters\Plain;
 
-function render(array $tree, string $valuePath = ''): string
+function render(array $tree, array $valuePath = []): string
 {
     $lines = array_map(function ($node) use ($valuePath) {
 
-        $key = $node['key'];
+        $key[] = $node['key'];
         $status = $node['status'];
         $oldValue = $node['oldValue'] ?? null;
         $newValue = $node['newValue'] ?? null;
+        $fullValuePath = [];
 
-        $fullValuePath = $valuePath === '' ? $key : "$valuePath.$key";
+        //$fullValuePath = $valuePath === '' ? $key : "$valuePath.$key";
+        if (empty($valuePath)) {
+            $fullValuePath = array_merge($fullValuePath, $key);
+        } else {
+            $fullValuePath = array_merge($valuePath, $key);
+        }
+
+        $path = implode('.', $fullValuePath);
 
         switch ($status) {
             case 'nested':
@@ -19,11 +27,11 @@ function render(array $tree, string $valuePath = ''): string
             case 'unchanged':
                 return;
             case 'added':
-                return "Property '$fullValuePath' was added with value: " . convertString($newValue);
+                return "Property '$path' was added with value: " . convertString($newValue);
             case 'deleted':
-                return "Property '$fullValuePath' was removed";
+                return "Property '$path' was removed";
             case 'changed':
-                return "Property '$fullValuePath' was updated. From " .
+                return "Property '$path' was updated. From " .
                     convertString($oldValue) . " to " . convertString($newValue);
             default:
                 throw new \Exception("Unknown node status: '$status'");
