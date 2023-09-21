@@ -47,14 +47,13 @@ function convertString(mixed $value, int $depth): string
         return "$value";
     }
     if (is_object($value)) {
-        $value = (array) $value;
         $indent = str_repeat('    ', $depth + 1);
 
-        $keys = array_keys($value);
-        $lines = array_map(function ($key, $value) use ($indent, $depth) {
-            $result = convertString($value, $depth + 1);
+        $keys = array_keys(get_object_vars($value));
+        $lines = array_map(function ($key) use ($value, $indent, $depth) {
+            $result = convertString($value->$key, $depth + 1);
             return "$indent    $key: $result";
-        }, $keys, $value);
+        }, $keys);
 
         $string = implode("\n", $lines);
 
