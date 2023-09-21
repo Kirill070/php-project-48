@@ -7,8 +7,8 @@ function render(array $tree, array $valuePath = []): string
     $lines = array_map(function ($node) use ($valuePath) {
 
         $status = $node['status'];
-        $oldValue = $node['oldValue'] ?? null;
-        $newValue = $node['newValue'] ?? null;
+        $oldValue = convertString($node['oldValue'] ?? null);
+        $newValue = convertString($node['newValue'] ?? null);
         $fullValuePath = array_merge($valuePath, [$node['key']]);
 
         $path = implode('.', $fullValuePath);
@@ -19,12 +19,11 @@ function render(array $tree, array $valuePath = []): string
             case 'unchanged':
                 return;
             case 'added':
-                return "Property '$path' was added with value: " . convertString($newValue);
+                return "Property '$path' was added with value: $newValue";
             case 'deleted':
                 return "Property '$path' was removed";
             case 'changed':
-                return "Property '$path' was updated. From " .
-                    convertString($oldValue) . " to " . convertString($newValue);
+                return "Property '$path' was updated. From $oldValue to $newValue";
             default:
                 throw new \Exception("Unknown node status: '$status'");
         }
