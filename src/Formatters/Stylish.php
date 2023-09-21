@@ -46,7 +46,8 @@ function convertString(mixed $value, int $depth): string
     if (is_string($value)) {
         return "$value";
     }
-    if (is_array($value)) {
+    if (is_object($value)) {
+        $value = (array) $value;
         $indent = str_repeat('    ', $depth + 1);
 
         $keys = array_keys($value);

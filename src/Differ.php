@@ -16,31 +16,31 @@ function getFileData(string $path): string
     return $data;
 }
 
-function makeTree(array $data1, array $data2): array
+function makeTree(object $data1, object $data2): array
 {
-    $keys = array_unique(array_merge(array_keys($data1), array_keys($data2)));
+    $keys = array_unique(array_merge(array_keys((array) $data1), array_keys((array) $data2)));
     $sortKeys = sort($keys, fn ($left, $right) => strcmp($left, $right));
 
     $tree = array_map(function ($key) use ($data1, $data2) {
 
-        $oldValue = $data1[$key] ?? null;
-        $newValue = $data2[$key] ?? null;
+        $oldValue = $data1->$key ?? null;
+        $newValue = $data2->$key ?? null;
 
-        if (is_array($oldValue) && is_array($newValue)) {
+        if (is_object($oldValue) && is_object($newValue)) {
             return [
                 'key' => $key,
                 'status' => 'nested',
                 'children' => makeTree($oldValue, $newValue)
             ];
         }
-        if (!key_exists($key, $data2)) {
+        if (!property_exists($data2, $key)) {
             return [
                 'key' => $key,
                 'status' => 'deleted',
                 'oldValue' => $oldValue
             ];
         }
-        if (!key_exists($key, $data1)) {
+        if (!property_exists($data1, $key)) {
             return [
                 'key' => $key,
                 'status' => 'added',

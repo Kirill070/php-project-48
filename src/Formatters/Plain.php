@@ -47,7 +47,7 @@ function convertString(mixed $value): string
         return "'$value'";
     }
 
-    if (is_array($value)) {
+    if (is_object($value)) {
         return "[complex value]";
     }
 
