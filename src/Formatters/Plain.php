@@ -6,18 +6,10 @@ function render(array $tree, array $valuePath = []): string
 {
     $lines = array_map(function ($node) use ($valuePath) {
 
-        $key[] = $node['key'];
         $status = $node['status'];
         $oldValue = $node['oldValue'] ?? null;
         $newValue = $node['newValue'] ?? null;
-        $fullValuePath = [];
-
-        //$fullValuePath = $valuePath === '' ? $key : "$valuePath.$key";
-        if (empty($valuePath)) {
-            $fullValuePath = array_merge($fullValuePath, $key);
-        } else {
-            $fullValuePath = array_merge($valuePath, $key);
-        }
+        $fullValuePath = array_merge($valuePath, [$node['key']]);
 
         $path = implode('.', $fullValuePath);
 
