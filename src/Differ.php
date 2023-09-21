@@ -18,7 +18,7 @@ function getFileData(string $path): string
 
 function makeTree(object $data1, object $data2): array
 {
-    $keys = array_unique(array_merge(array_keys((array) $data1), array_keys((array) $data2)));
+    $keys = array_unique(array_merge(array_keys(get_object_vars($data1)), array_keys(get_object_vars($data2))));
     $sortKeys = sort($keys, fn ($left, $right) => strcmp($left, $right));
 
     $tree = array_map(function ($key) use ($data1, $data2) {
